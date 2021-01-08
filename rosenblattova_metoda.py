@@ -82,7 +82,7 @@ def prehazet(X, labels, pocet_prvku=0):
     return X[indexes, :], labels[indexes]
 
 
-def zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels):
+def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
     """
     Zobrazení označených bodů podle příslušných tříd
     """
@@ -174,4 +174,4 @@ if __name__ == '__main__':
     # klasifikace bodů
     grid_labels = classify(grid, diskr_fce)
 
-    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels)
+    zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels)
