@@ -123,7 +123,7 @@ def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
 
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.title('Rossenblattův algoritmus')
+    plt.title('Rosenblattův algoritmus')
     plt.show()
     return
 

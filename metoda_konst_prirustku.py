@@ -85,7 +85,7 @@ def prehazet(X, labels, pocet_prvku=0):
     return X[indexes, :], labels[indexes]
 
 
-def zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels):
+def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
     """
     Zobrazení označených bodů podle příslušných tříd
     """
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     Y, labels = prehazet(Y, labels, pocet_prvku=len(Y))
 
     diskr_fce, vyvoje_cen = train_multiple_fcns(Y, labels, num_epochs=10, beta=0.05)
-
+    print
     # vytvorit rast pro zobrazeni rozdeleni prostoru
     A, B = np.mgrid[-10:10.5:0.3, -5:10.5:0.3]
     grid = np.vstack((A.flatten(), B.flatten())).T
@@ -180,4 +180,4 @@ if __name__ == '__main__':
     # klasifikace bodů
     grid_labels = classify(grid, diskr_fce)
 
-    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels)
+    zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels)
