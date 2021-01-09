@@ -89,6 +89,25 @@ def zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels):
     return
 
 
+def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, means, covs, pc):
+    # vytvorit rast pro zobrazeni rozdeleni prostoru
+    x_min = np.min(Y[:, 0]) - 1
+    x_max = np.max(Y[:, 0]) + 1
+    x_step = (x_max - x_min)/60
+    y_min = np.min(Y[:, 1]) - 1
+    y_max = np.max(Y[:, 1]) + 1
+    y_step = (y_max - y_min)/60
+    A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
+    grid = np.vstack((A.flatten(), B.flatten())).T
+
+    # klasifikace bodů
+    grid_labels = klasifikuj(grid, means, covs, pc)
+
+    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels)
+
+
+
+
 # testovaci cast souboru
 if __name__ == '__main__':
     # Načtení dat
@@ -101,10 +120,7 @@ if __name__ == '__main__':
     means, covs, pc = bayes(Y, labels)
     print("Čas běhu:", time.time() - start, 's')
 
-    # vytvorit rast pro zobrazeni rozdeleni prostoru
-    A, B = np.mgrid[-10:10.5:0.35, -5:10.5:0.35]
-    grid = np.vstack((A.flatten(), B.flatten())).T
-    grid_labels = klasifikuj(grid, means, covs, pc)
+    vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, means, covs, pc)
 
-    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels)
+
 
