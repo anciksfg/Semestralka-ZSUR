@@ -14,8 +14,15 @@ def vektorova_kvantizace(X, pocet_trid):
     # stredy = kodova kniha
 
     # vytvorit rast pro zobrazeni rozdeleni prostoru
-    A, B = np.mgrid[-10:10.5:0.35, -5:10.5:0.35]
+    x_min = np.min(X[:, 0]) - 1
+    x_max = np.max(X[:, 0]) + 1
+    x_step = (x_max - x_min)/50
+    y_min = np.min(X[:, 1]) - 1
+    y_max = np.max(X[:, 1]) + 1
+    y_step = (y_max - y_min)/50
+    A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
     grid = np.vstack((A.flatten(), B.flatten())).T
+
     grid_labels, grid_ceny = rozdel_grid(grid, stredy)
 
     return stredy, grid, grid_labels, Y, labels
