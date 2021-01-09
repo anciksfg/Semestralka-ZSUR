@@ -110,7 +110,7 @@ def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
     barvy = ['red', 'green', 'blue', 'purple', 'pink', 'orange', 'firebrick', 'magenta']
 
     # Zobrazení vývoje ceny
-    plt.figure(figsize=(6, 3))
+    plt.figure(figsize=(15, 5))
     plt.subplot(1, 2, 1)
     plt.plot(vyvoje_cen, color='firebrick')
     plt.title('Vývoj počtu chyb během trénování')
@@ -182,9 +182,15 @@ def classify(Data, diskr_fce):
     return labels
 
 
-def vytvor_grid_klasifikuj_zobraz(disk_fce, vyvoje_cen):
+def vytvor_grid_klasifikuj_zobraz(Y, diskr_fce, vyvoje_cen):
     # vytvorit rast pro zobrazeni rozdeleni prostoru
-    A, B = np.mgrid[-10:10.5:0.3, -5:10.5:0.3]
+    x_min = np.min(Y[:, 0]) - 1
+    x_max = np.max(Y[:, 0]) + 1
+    x_step = (x_max - x_min)/60
+    y_min = np.min(Y[:, 1]) - 1
+    y_max = np.max(Y[:, 1]) + 1
+    y_step = (y_max - y_min)/60
+    A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     # klasifikace bodů
@@ -246,4 +252,4 @@ if __name__ == '__main__':
     Y, labels = prehazet(Y, labels, pocet_prvku=len(Y))
 
     diskr_fce, vyvoje_cen = train_multiple_fcns(Y, labels, num_epochs=20)
-    vytvor_grid_klasifikuj_zobraz(diskr_fce, vyvoje_cen)
+    vytvor_grid_klasifikuj_zobraz(Y, diskr_fce, vyvoje_cen)
