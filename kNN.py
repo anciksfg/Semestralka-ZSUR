@@ -95,10 +95,7 @@ def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k):
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     # klasifikace bodů
-    if k == 1:
-        grid_labels = NN_klasifikuj(Y, labels, grid)
-    else:
-        grid_labels = kNN_klasifikuj(Y, labels, grid, k=k)
+    grid_labels = kNN_klasifikuj(Y, labels, grid, k=k)
 
     zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels, k=k)
 
@@ -120,7 +117,7 @@ if __name__ == '__main__':
     print('Čas běhu podle 1-nejbližšího souseda:', time.time() - start)
 
     start = time.time()
-    # Klasifikace podle jednoho nejbližšího souseda
+    # Klasifikace podle dvou nejbližších sousedů
     vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k=2)
     print('Čas běhu podle 2-nejbližších sousedů:', time.time() - start)
 
