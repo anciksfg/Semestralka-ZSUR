@@ -87,10 +87,10 @@ def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k):
     # vytvorit rast pro zobrazeni rozdeleni prostoru
     x_min = np.min(Y[:, 0]) - 1
     x_max = np.max(Y[:, 0]) + 1
-    x_step = (x_max - x_min)/50
+    x_step = (x_max - x_min)/60
     y_min = np.min(Y[:, 1]) - 1
     y_max = np.max(Y[:, 1]) + 1
-    y_step = (y_max - y_min)/50
+    y_step = (y_max - y_min)/60
     A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
     grid = np.vstack((A.flatten(), B.flatten())).T
 
