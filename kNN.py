@@ -83,6 +83,24 @@ def zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels, k):
         plt.show()
     return
 
+def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k):
+    # vytvorit rast pro zobrazeni rozdeleni prostoru
+    x_min = np.min(Y[:, 0]) - 1
+    x_max = np.max(Y[:, 0]) + 1
+    x_step = (x_max - x_min)/50
+    y_min = np.min(Y[:, 1]) - 1
+    y_max = np.max(Y[:, 1]) + 1
+    y_step = (y_max - y_min)/50
+    A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
+    grid = np.vstack((A.flatten(), B.flatten())).T
+
+    # klasifikace bodů
+    if k == 1:
+        grid_labels = NN_klasifikuj(Y, labels, grid)
+    else:
+        grid_labels = kNN_klasifikuj(Y, labels, grid, k=k)
+
+    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels, k=k)
 
 # testovaci cast souboru
 if __name__ == '__main__':
@@ -97,13 +115,12 @@ if __name__ == '__main__':
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     start = time.time()
-    grid_labels = NN_klasifikuj(Y, labels, grid)
+    # Klasifikace podle jednoho nejbližšího souseda
+    vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k=1)
     print('Čas běhu podle 1-nejbližšího souseda:', time.time() - start)
 
-    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels, k=1)
-
     start = time.time()
-    grid_labels = kNN_klasifikuj(Y, labels, grid, k=2)
+    # Klasifikace podle jednoho nejbližšího souseda
+    vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, k=2)
     print('Čas běhu podle 2-nejbližších sousedů:', time.time() - start)
 
-    zobraz_rozdeleni(stredy, grid, grid_labels, Y, labels, k=2)
