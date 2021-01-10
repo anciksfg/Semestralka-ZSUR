@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def train_multiple_fcns(Y, labels, num_epochs=20):
     """
     Vraci n x n - 1 diskriminacnich fci, kde n je pocet trid
@@ -24,7 +25,8 @@ def train_multiple_fcns(Y, labels, num_epochs=20):
             mnozina_i = mnoziny[i]
             mnozina_j = mnoziny[j]
             # sjednoceni trenovacich mnozin
-            body = np.array([mnozina_i[k, :] if k < pocty[i] else mnozina_j[k - pocty[i], :] for k in range(pocty[i] + pocty[j])])
+            body = np.array(
+                [mnozina_i[k, :] if k < pocty[i] else mnozina_j[k - pocty[i], :] for k in range(pocty[i] + pocty[j])])
             oznaceni = np.array([1 if k < pocty[i] else -1 for k in range(pocty[i] + pocty[j])])
             body, oznaceni = prehazet(body, oznaceni)
 
@@ -35,7 +37,7 @@ def train_multiple_fcns(Y, labels, num_epochs=20):
             # testovaci_body = np.array([[1, 7.5, 4], [1, 0, -3], [1, -7.5, 3], [1, 0, 5]])
             # for bod in testovaci_body:
             #     print('bod:', bod, 'hodnota fce:', q.T.dot(bod))
-            # vytvor_grid_klasifikuj_zobraz_podle_jedne(q)
+            # vytvor_grid_klasifikuj_zobraz_podle_jedne(Y, q)
 
             diskr_fce[i][j] = q
             diskr_fce[j][i] = -q
@@ -54,7 +56,8 @@ def train(X, labels, num_epochs, c=1):
     m = len(labels)
     # inicializovat váhový vektor vcetne extra sloupce pro bias
     dim = X.shape[1]
-    q = np.random.rand(dim + 1)
+    q = np.zeros(dim + 1)
+    q[0] = np.average(X[:, 1], axis=0)
     vyvoj_ceny = []
 
     # trénování v epochách
@@ -70,12 +73,13 @@ def train(X, labels, num_epochs, c=1):
             # urcena trida klasifikatorem
             predicted = int(predict(bod, q))
 
-            rozdil = (label - predicted)/2
+            rozdil = (label - predicted) / 2
             # rozdil = (predicted - label)/2
             # pokud tridy souhlasi, gradient nulovy, jinak ve smeru -x
             grad = -bod * rozdil
             # updatovat vahovou matici
             q = q - c * grad
+            # vytvor_grid_klasifikuj_zobraz_podle_jedne(Y, q)
 
             if rozdil != 0:
                 cena += 1
@@ -125,7 +129,6 @@ def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
     grid = np.array(grid)
     grid_labels = np.array(grid_labels)
 
-
     # zobrazeni gridu
     for i in range(0, pocet_trid):
         plt.scatter(grid[grid_labels == i, 0], grid[grid_labels == i, 1], s=5, marker='o', color=barvy[i])
@@ -150,7 +153,11 @@ def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels):
     return
 
 
-def classify(Data, diskr_fce):
+def classify(Data, diskr_fce, norm_mean):
+    """
+    Klasifikuje data, která nejdříve normalizuje podle konstant použitých v trénování
+    """
+    Data -= norm_mean
     pocet_trid = len(diskr_fce)
     # pocet bodů
     m = len(Data)
@@ -179,30 +186,40 @@ def classify(Data, diskr_fce):
             elif min(hodnoty_diskr_fci) > 0 and label != -1:
                 label = -2
         labels[i] = label
+    Data += norm_mean
     return labels
 
 
-def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, diskr_fce, vyvoje_cen):
+def vytvor_grid_klasifikuj_zobraz(Y, labels, norm_mean, stredy, diskr_fce, vyvoje_cen):
     # vytvorit rast pro zobrazeni rozdeleni prostoru
     x_min = np.min(Y[:, 0]) - 1
     x_max = np.max(Y[:, 0]) + 1
-    x_step = (x_max - x_min)/60
+    x_step = (x_max - x_min) / 60
     y_min = np.min(Y[:, 1]) - 1
     y_max = np.max(Y[:, 1]) + 1
-    y_step = (y_max - y_min)/60
+    y_step = (y_max - y_min) / 60
     A, B = np.mgrid[x_min:x_max:x_step, y_min:y_max:y_step]
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     # klasifikace bodů
-    grid_labels = classify(grid, diskr_fce)
+    grid_labels = classify(grid, diskr_fce, norm_mean)
 
     zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels)
 
 
-#___________________Testing_________________
+def normalize(Y):
+    mean = np.mean(Y, axis=0)
+    Y_normalized = Y.copy() - mean
+    return Y_normalized, mean
+
+
+# ___________________Testing_________________
 
 
 def classify_podle_jedne_fce(Y, q):
+    """
+    Zatím neopraveno pro normalizaci dat
+    """
     # pocet bodu
     m = len(Y)
     pocet_trid = len(q)
@@ -228,12 +245,19 @@ def classify_podle_jedne_fce(Y, q):
     return labels
 
 
-def vytvor_grid_klasifikuj_zobraz_podle_jedne(q):
+def vytvor_grid_klasifikuj_zobraz_podle_jedne(Y, q):
     """
     zobrazi klasifikaci podle dane fce
+    Zatím neopraveno pro normalizaci dat
     """
     # vytvorit rast pro zobrazeni rozdeleni prostoru
-    A, B = np.mgrid[-10:10.5:0.3, -5:10.5:0.3]
+    x_min = np.min(Y[:, 0]) - 1
+    x_max = np.max(Y[:, 0]) + 1
+    x_step = (x_max - x_min) / 60
+    y_min = np.min(Y[:, 1]) - 1
+    y_max = np.max(Y[:, 1]) + 1
+    y_step = (y_max - y_min) / 60
+    A, B = np.mgrid[0:x_max:x_step, y_min:y_max:y_step]
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     # klasifikace bodů
@@ -251,5 +275,7 @@ if __name__ == '__main__':
 
     Y, labels = prehazet(Y, labels, pocet_prvku=len(Y))
 
-    diskr_fce, vyvoje_cen = train_multiple_fcns(Y, labels, num_epochs=20)
-    vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, diskr_fce, vyvoje_cen)
+    Y_normalized, norm_mean = normalize(Y)
+    diskr_fce, vyvoje_cen = train_multiple_fcns(Y_normalized, labels, num_epochs=20)
+
+    vytvor_grid_klasifikuj_zobraz(Y, labels, norm_mean, stredy, diskr_fce, vyvoje_cen)

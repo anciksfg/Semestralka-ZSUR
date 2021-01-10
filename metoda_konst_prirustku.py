@@ -152,7 +152,8 @@ def zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels, beta):
     return
 
 
-def classify(Data, diskr_fce):
+def classify(Data, diskr_fce, norm_mean):
+    Data -= norm_mean
     pocet_trid = len(diskr_fce)
     # pocet bodů
     m = len(Data)
@@ -181,10 +182,11 @@ def classify(Data, diskr_fce):
             elif min(hodnoty_diskr_fci) > 0 and label != -1:
                 label = -2
         labels[i] = label
+    Data += norm_mean
     return labels
 
 
-def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, diskr_fce, vyvoje_cen, beta):
+def vytvor_grid_klasifikuj_zobraz(Y, labels, norm_mean, stredy, diskr_fce, vyvoje_cen, beta):
     # vytvorit rast pro zobrazeni rozdeleni prostoru
     x_min = np.min(Y[:, 0]) - 1
     x_max = np.max(Y[:, 0]) + 1
@@ -196,9 +198,15 @@ def vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, diskr_fce, vyvoje_cen, beta
     grid = np.vstack((A.flatten(), B.flatten())).T
 
     # klasifikace bodů
-    grid_labels = classify(grid, diskr_fce)
+    grid_labels = classify(grid, diskr_fce, norm_mean)
 
     zobraz_rozdeleni(vyvoje_cen, stredy, grid, grid_labels, Y, labels, beta)
+
+
+def normalize(Y):
+    mean = np.mean(Y, axis=0)
+    Y_normalized = Y.copy() - mean
+    return Y_normalized, mean
 
 
 # ___________________Testing_________________
@@ -253,6 +261,8 @@ if __name__ == '__main__':
 
     Y, labels = prehazet(Y, labels, pocet_prvku=len(Y))
 
-    diskr_fce, vyvoje_cen = train_multiple_fcns(Y, labels, num_epochs=20, beta=0.01)
-    vytvor_grid_klasifikuj_zobraz(Y, labels, stredy, diskr_fce, vyvoje_cen, beta=0.01)
+    Y_normalized, norm_mean = normalize(Y)
+    diskr_fce, vyvoje_cen = train_multiple_fcns(Y_normalized, labels, num_epochs=20, beta=0.01)
+
+    vytvor_grid_klasifikuj_zobraz(Y, labels, norm_mean, stredy, diskr_fce, vyvoje_cen, beta=0.01)
 
