@@ -15,3 +15,5 @@
   - **Vektorové kvanitzace**
   - **Klasifikátoru podle nejbližšího souseda**
   - **Klasifikátoru s lineárnimi diskriminačními funkcemi**
+
+Hlavní soubor - jupyter notebook Semestrální práce ZSUR
